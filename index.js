@@ -1,4 +1,4 @@
-const PLYLoader = require('./lib/PLYLoader.js');
+require('./lib/PLYLoader.js');
 
 if (typeof AFRAME === 'undefined') {
 	throw new Error('Component attempted to register before AFRAME was available.');
@@ -27,27 +27,27 @@ AFRAME.registerComponent('pointcloud', {
 			return;
 		}
 
-		const loader = new PLYLoader();
+		const loader = new THREE.PLYLoader();
 
+		const _this = this;
 		loader.load(this.data.src, function (geometry) {
-
-			material = new THREE.PointsMaterial({
-				size: this.data.size,
+			const material = new THREE.PointsMaterial({
+				size: _this.data.size,
 				vertexColors: THREE.VertexColors,
 			});
-			this.pointcloud = new THREE.Points(geometry, material);
+			_this.pointcloud = new THREE.Points(geometry, material);
 			/* 
 			Y in THREE.js is Z in almost all point cloud software so the point cloud must be rotated.
 			Do the rotation here and not as html propertie because of the bounding box computation.
 			Do the bounding box computation because the centroid of the cloud will be at 0,0,0
 			and thus the point cloud must be moved upwards.
 			*/
-			this.pointcloud.rotateX(-90);
-			this.pointcloud.geometry.computeBoundingBox();
-			const bbox = this.pointcloud.geometry.boundingBox;
-			this.pointcloud.position.y += (bbox.max.y - bbox.min.y) / 2;
+			_this.pointcloud.rotateX(-90);
+			_this.pointcloud.geometry.computeBoundingBox();
+			const bbox = _this.pointcloud.geometry.boundingBox;
+			_this.pointcloud.position.y += (bbox.max.y - bbox.min.y) / 2;
 
-			this.el.setObject3D('pointcloud', this.pointcloud);
+			_this.el.setObject3D('pointcloud', _this.pointcloud);
 		});
 	},
 
