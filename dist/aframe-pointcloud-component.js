@@ -58,9 +58,20 @@
 			src: {
 				type: 'asset'
 			},
+			texture: {
+				type: 'asset'
+			},
 			size: {
 				type: 'number',
 				default: 1
+			},
+			opacity: {
+				type: 'number',
+				default: 1
+			},
+			depthWrite: {
+				type: 'boolean',
+				default: true
 			},
 		},
 
@@ -74,31 +85,49 @@
 			}
 
 			const loader = new THREE.PLYLoader();
-
+			
 			const _this = this;
 			loader.load(this.data.src, function (geometry) {
-				const material = new THREE.PointsMaterial({
-					size: _this.data.size,
-					vertexColors: THREE.VertexColors,
-				});
-				_this.pointcloud = new THREE.Points(geometry, material);
-				/* 
-				Y in THREE.js is Z in almost all point cloud software so the point cloud must be rotated.
-				Do the rotation here and not as html propertie because of the bounding box computation.
-				Do the bounding box computation because the centroid of the cloud will be at 0,0,0
-				and thus the point cloud must be moved upwards.
-				*/
-				_this.pointcloud.rotateX(-90);
-				_this.pointcloud.geometry.computeBoundingBox();
-				const bbox = _this.pointcloud.geometry.boundingBox;
-				_this.pointcloud.position.y += (bbox.max.y - bbox.min.y) / 2;
 
+				var material;
+				if (_this.data.texture) {
+					const sprite = new THREE.TextureLoader().load( _this.data.texture );
+					material = new THREE.PointsMaterial({
+						size: _this.data.size,
+						vertexColors: THREE.VertexColors,
+						map: sprite,
+						transparent: true,
+						opacity: _this.data.opacity,
+						depthWrite: _this.data.depthWrite,
+					});
+				} else {
+					material = new THREE.PointsMaterial({
+						size: _this.data.size,
+						vertexColors: THREE.VertexColors,
+						transparent: true,
+						opacity: _this.data.opacity,
+					});
+				}
+				_this.pointcloud = new THREE.Points(geometry, material);
 				_this.el.setObject3D('pointcloud', _this.pointcloud);
 			});
 		},
 
 		remove: function () {},
 
+	});
+
+	AFRAME.registerPrimitive('a-pointcloud', {
+	  defaultComponents: {
+	    pointcloud: {}
+	  },
+	  mappings: {
+		src: 'pointcloud.src',
+		texture: 'pointcloud.texture',
+	    size: 'pointcloud.size',
+		opacity: 'pointcloud.opacity',
+		depthWrite: 'pointcloud.depthWrite'
+	  }
 	});
 
 /***/ }),
