@@ -12,7 +12,6 @@ A Point Cloud component for [A-Frame](https://aframe.io).
 | texture  | path to a .png file   | "". Optional             |
 | size     | size of the rendered points   | 1             |
 | opacity     | opacity of the rendered points   | 1             |
-| size     | size of the rendered points   | 1             |
 | depthWrite     | When using texture it can be useful to set this to false in order to avoid creating z-index artifacts.    | true  |
 
 You might have to also adjust the `scale`, `position` and `rotation` properties in order to fit the point cloud to your scene.
